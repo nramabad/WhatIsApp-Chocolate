@@ -43,3 +43,5 @@ config :what_is_app, WhatIsApp.Repo,
   hostname: "localhost",
   pool_size: 10
 
+config :guardian, Guardian,
+  secret_key: "3VArwVY8E5vXvYZ2Ajg+FAomb7K5PF/MjdtDVFULvg1tu38ML0cv40uWanTv5u6i"
