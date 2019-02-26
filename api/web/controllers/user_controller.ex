@@ -1,28 +1,30 @@
-# defmodule WhatIsApp.UserController do
-#   use WhatIsApp.Web, :controller
+defmodule WhatIsApp.UserController do
+  use WhatIsApp.Web, :controller
 
-#   alias WhatIsApp.User
+  alias WhatIsApp.User
 
 #   def index(conn, _params) do
 #     users = Repo.all(User)
 #     render(conn, "index.json", users: users)
 #   end
 
-#   def create(conn, %{"user" => user_params}) do
-#     changeset = User.changeset(%User{}, user_params)
+  def create(conn, %{"user" => user_params}) do
+    changeset = User.registration_changeset(%User{}, params)
 
-#     case Repo.insert(changeset) do
-#       {:ok, user} ->
-#         conn
-#         |> put_status(:created)
-#         |> put_resp_header("location", user_path(conn, :show, user))
-#         |> render("show.json", user: user)
-#       {:error, changeset} ->
-#         conn
-#         |> put_status(:unprocessable_entity)
-#         |> render(WhatIsApp.ChangesetView, "error.json", changeset: changeset)
-#     end
-#   end
+    case Repo.insert(changeset) do
+      {:ok, user} ->
+        new_conn = Guardian.Plug.api_sign_in(conn, user, :access)
+        jwt = Guardian.Plug.current_token(new_conn)
+
+        new_conn
+        |> put_status(:created)
+        |> render(WhatIsApp.SessionView, "show.json", user: user, jwt: jwt)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(WhatIsApp.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
 
 #   def show(conn, %{"id" => id}) do
 #     user = Repo.get!(User, id)
@@ -52,4 +54,4 @@
 
 #     send_resp(conn, :no_content, "")
 #   end
-# end
+end
