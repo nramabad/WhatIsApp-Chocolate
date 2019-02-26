@@ -42,3 +42,4 @@ config :what_is_app, WhatIsApp.Repo,
   database: "what_is_app_dev",
   hostname: "localhost",
   pool_size: 10
+
